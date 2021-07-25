@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <!-- <meta http-equiv="X-UA-Compatible" content="IE=edge"> -->
+    <!-- <meta name="viewport" content="width=device-width, initial-scale=1.0"> -->
+    <title>Snek Game</title>
+</head>
+
+<body>
+    <canvas id="gameCanvas" width="400" height="400"></canvas>
+    <style>
+        #snakeboard {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+        }
+    </style>
+</body>
+
+<script>
+    //make board
+    const board_border = 'black';
+    const board_background = "white";
+
+    //make snake
+    let snake = [{ x: 200, y: 200 }, { x: 190, y: 200 }, { x: 180, y: 200 }, { x: 170, y: 200 }, { x: 160, y: 200 },];
+
+    function drawSnakePart(snakePart) {
+        snakeboard_ctx.fillStyle = 'lightblue';
+        snakeboard_ctx.strokestyle = 'darkblue';
+        snakeboard_ctx.fillRect(snakePart.x, snakePart.y, 10, 10);
+        snakeboard_ctx.strokeRect(snakePart.x, snakePart.y, 10, 10);
+    }
+
+    const snakeboard = document.getElementById("gameCanvas");
+    const snakeboard_ctx = gameCanvas.getContext("2d");
+
+    //start
+    main();
+
+    // main function called repeatedly to keep the game running
+    function main() {
+        clearCanvas();
+    }
+
+    // draw a border around the canvas
+    function clearCanvas() {
+        //  Select the colour to fill the drawing
+        snakeboard_ctx.fillStyle = board_background;
+        //  Select the colour for the border of the canvas
+        snakeboard_ctx.strokestyle = board_border;
+        // Draw a "filled" rectangle to cover the entire canvas
+        snakeboard_ctx.fillRect(0, 0, snakeboard.width, snakeboard.height);
+        // Draw a "border" around the entire canvas
+        snakeboard_ctx.strokeRect(0, 0, snakeboard.width, snakeboard.height);
+    }
+
+    /*Function that prints the parts*/
+    function drawSnake() {
+        snake.forEach(drawSnakePart);
+    }
+
+    //horizontal movement
+    function move_snake() {
+        const head = { x: snake[0].x + dx, y: snake[0].y +dy};
+        snake.unshift(head);
+        snake.pop();
+    }
+
+</script>
+
+</html>
