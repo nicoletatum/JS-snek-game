@@ -8,6 +8,7 @@
 </head>
 
 <body>
+    <div id="score">0</div>
     <canvas id="snakeboard" width="400" height="400"></canvas>
     <style>
         #snakeboard {
@@ -27,6 +28,7 @@
     //make snake
     let snake = [{ x: 200, y: 200 }, { x: 190, y: 200 }, { x: 180, y: 200 }, { x: 170, y: 200 }, { x: 160, y: 200 },];
 
+    let score = 0;
     // True if changing direction
     let changing_direction = false;
     // Horizontal velocity
@@ -34,31 +36,37 @@
     // Vertical velocity
     let dy = 0;
 
+    let food_x;
+    let food_y;
+
+
     /*Function that prints the parts*/
-    
+
     const snakeboard = document.getElementById("snakeboard");
     const snakeboard_ctx = snakeboard.getContext("2d");
-    
+
     //start
     main();
-    
+    gen_food();
+
     document.addEventListener("keydown", change_direction)
-    
+
     // main function called repeatedly to keep the game running
     function main() {
-        
+
         if (has_game_ended()) return;
-        
+
         changing_direction = false;
         setTimeout(function onTick() {
             clear_board();
             move_snake();
             drawSnake();
+            drawFood();
             // Call main again
             main();
         }, 100)
     }
-    
+
     // draw a border around the canvas
     function clear_board() {
         //  Select the colour to fill the drawing
@@ -70,22 +78,22 @@
         // Draw a "border" around the entire canvas
         snakeboard_ctx.strokeRect(0, 0, snakeboard.width, snakeboard.height);
     }
-    
-    
+
+
     function has_game_ended() {
         for (let i = 4; i < snake.length; i++) {
             const has_collided = snake[i].x === snake[0].x && snake[i].y === snake[0].y
             if (has_collided)
-            return true
+                return true
         }
         const hitLeftWall = snake[0].x < 0;
         const hitRightWall = snake[0].x > snakeboard.width - 10;
         const hitToptWall = snake[0].y < 0;
         const hitBottomWall = snake[0].y > snakeboard.height - 10;
-        
+
         return hitLeftWall || hitRightWall || hitToptWall || hitBottomWall
     }
-    
+
     function drawSnake() {
         snake.forEach(drawSnakePart);
     }
@@ -95,7 +103,7 @@
         snakeboard_ctx.fillRect(snakePart.x, snakePart.y, 10, 10);
         snakeboard_ctx.strokeRect(snakePart.x, snakePart.y, 10, 10);
     }
-    
+
     function change_direction(event) {
         const LEFT_KEY = 37;
         const RIGHT_KEY = 39;
@@ -129,14 +137,62 @@
         }
     }
 
+    function random_food(min, max) {
+        return Math.round((Math.random() * (max - min) + min) / 10) * 10;
+    }
+
+    function gen_food() {
+        food_x = random_food(0, snakeboard.width - 10);
+        food_y = random_food(0, snakeboard.height - 10);
+        snake.forEach(function has_snake_eaten_food(part) {
+            const has_eaten = part.x == food_x && part.y == food_y;
+            if (has_eaten) gen_food();
+        });
+    }
+
+    function drawFood() {
+        snakeboard_ctx.fillStyle = 'lightgreen';
+        snakeboard_ctx.strokestyle = 'darkgreen';
+        snakeboard_ctx.fillRect(food_x, food_y, 10, 10);
+        snakeboard_ctx.strokeRect(food_x, food_y, 10, 10);
+    }
 
     //horizontal movement
     function move_snake() {
         const head = { x: snake[0].x + dx, y: snake[0].y + dy };
         snake.unshift(head);
-        snake.pop();
+        const has_eaten_food = snake[0].x === food_x && snake[0].y === food_y;
+        if (has_eaten_food) {
+            // Generate new food location
+            // Increase score
+            score += 10;
+            // Display score on screen
+            document.getElementById('score').innerHTML = score;
+            gen_food();
+        } else {
+            //remove last part of snake body
+            snake.pop();
+        }
     }
-
+    document.addEventListener("DOMContentLoaded", function () {
+        pTag = document.querySelector("div");
+        newVal = document.createElement("p");
+        newVal.innerHTML = '';
+        pTag.appendChild(newVal);
+    });
+      // Async Tests Example
+    /*
+    window.onModulesLoaded = new Promise( function( resolve, reject ) {
+      setTimeout(function() {
+        pTag = document.querySelector("div");
+        pTag.innerHTML = '';
+        newVal = document.createElement("p");
+        newVal.innerHTML = 'Hello World';
+        pTag.appendChild(newVal);
+        resolve();
+      }, 100)
+    });
+    */
 </script>
 
 </html>
